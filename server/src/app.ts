@@ -10,6 +10,7 @@ import { acceptInviteController } from './modules/invites/invite.controller'
 import { errorHandler } from './lib/middleware/error.middleware'
 import { validate } from './lib/middleware/validate.middleware'
 import { acceptInviteSchema } from './modules/invites/invite.schemas'
+import { authRateLimit, apiRateLimit } from './lib/middleware/ratelimit.middleware'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -21,11 +22,11 @@ app.get('/health', (req, res) => {
   res.json({ status: 'TeamOrbit server is running' })
 })
 
-app.use('/api/auth', authRouter)
-app.use('/api/orgs', orgRouter)
-app.use('/api/orgs/:slug/projects', projectRouter)
-app.use('/api/orgs/:slug/projects/:projectId/tasks', taskRouter)
-app.use('/api/orgs/:slug/invites', inviteRouter)
+app.use('/api/auth', authRateLimit, authRouter)
+app.use('/api/orgs', apiRateLimit, orgRouter)
+app.use('/api/orgs/:slug/projects', apiRateLimit, projectRouter)
+app.use('/api/orgs/:slug/projects/:projectId/tasks', apiRateLimit, taskRouter)
+app.use('/api/orgs/:slug/invites', apiRateLimit, inviteRouter)
 
 app.post('/api/invites/accept', authenticate, validate(acceptInviteSchema), acceptInviteController)
 
