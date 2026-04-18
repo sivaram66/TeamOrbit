@@ -1,5 +1,6 @@
 import express from 'express'
 import helmet from 'helmet'
+import cors from 'cors'
 import authRouter from './modules/auth/auth.routes'
 import orgRouter from './modules/orgs/org.routes'
 import projectRouter from './modules/projects/project.routes'
@@ -15,6 +16,13 @@ import { authRateLimit, apiRateLimit } from './lib/middleware/ratelimit.middlewa
 
 const app = express()
 const PORT = process.env.PORT || 5000
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}))
 
 app.use(helmet())
 app.use(express.json())
