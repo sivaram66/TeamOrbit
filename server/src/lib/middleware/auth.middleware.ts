@@ -14,9 +14,17 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     }
 
     const token = authHeader.split(' ')[1]
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthTokenPayload
-    req.user = decoded
-    next()
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as AuthTokenPayload
+      req.user = decoded
+      next()
+    } catch (err: any) {
+      if (err.name === 'TokenExpiredError') {
+        throw new UnauthorizedError('Token expired')
+      }
+      throw new UnauthorizedError('Invalid token')
+    }
   } catch (error) {
     next(error)
   }

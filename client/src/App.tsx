@@ -1,10 +1,13 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import { useAuthStore } from './stores/auth.store'
 import { useOrgStore } from './stores/org.store'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { OnboardingPage } from './pages/onboarding/OnboardingPage'
 import { AppShell } from './components/layouts/AppShell'
+import { ProjectsPage } from './pages/projects/ProjectsPage'
+import api from './lib/axios'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore()
@@ -20,7 +23,18 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore()
-  const { currentOrg } = useOrgStore()
+  const { currentOrg, setCurrentOrg } = useOrgStore()
+
+  useEffect(() => {
+    if (isAuthenticated && !currentOrg) {
+      api.get('/orgs/mine').then((res) => {
+        if (res.data?.data?.length > 0) {
+          setCurrentOrg(res.data.data[0])
+        }
+      }).catch(() => {})
+    }
+  }, [isAuthenticated, currentOrg])
+
   if (!isAuthenticated) return <Navigate to="/login" replace />
   if (!currentOrg) return <Navigate to="/onboarding" replace />
   return <AppShell>{children}</AppShell>
@@ -45,41 +59,29 @@ function App() {
 
       <Route path="/dashboard" element={
         <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>
-            Dashboard coming soon
-          </div>
+          <div style={{ color: '#888888', fontSize: '14px' }}>Dashboard coming soon</div>
         </AppRoute>
       } />
 
       <Route path="/org/:slug/dashboard" element={
         <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>
-            Dashboard coming soon
-          </div>
+          <div style={{ color: '#888888', fontSize: '14px' }}>Dashboard coming soon</div>
         </AppRoute>
       } />
 
       <Route path="/org/:slug/projects" element={
-        <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>
-            Projects coming soon
-          </div>
-        </AppRoute>
+        <AppRoute><ProjectsPage /></AppRoute>
       } />
 
       <Route path="/org/:slug/members" element={
         <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>
-            Members coming soon
-          </div>
+          <div style={{ color: '#888888', fontSize: '14px' }}>Members coming soon</div>
         </AppRoute>
       } />
 
       <Route path="/org/:slug/settings" element={
         <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>
-            Settings coming soon
-          </div>
+          <div style={{ color: '#888888', fontSize: '14px' }}>Settings coming soon</div>
         </AppRoute>
       } />
     </Routes>

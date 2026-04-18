@@ -64,3 +64,18 @@ export const getOrgBySlug = async (slug: string, userId: string) => {
 
   return org
 }
+
+export const getUserOrgs = async (userId: string) => {
+  const memberships = await prisma.orgMembership.findMany({
+    where: { userId },
+    include: {
+      org: true,
+    },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  return memberships.map(m => ({
+    ...m.org,
+    role: m.role,
+  }))
+}
