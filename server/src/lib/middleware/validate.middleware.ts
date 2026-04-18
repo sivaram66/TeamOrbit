@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { ZodSchema } from 'zod'
+import { ZodSchema, ZodError } from 'zod'
 import { ValidationError } from '../errors'
 
 export const validate = (schema: ZodSchema) => {
@@ -7,8 +7,8 @@ export const validate = (schema: ZodSchema) => {
     const result = schema.safeParse(req.body)
 
     if (!result.success) {
-      const message = result.error.errors
-        .map(err => `${err.path.join('.')}: ${err.message}`)
+      const message = (result.error as ZodError).issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
         .join(', ')
 
       return next(new ValidationError(message))
