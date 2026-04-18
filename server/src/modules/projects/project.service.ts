@@ -1,6 +1,7 @@
 import prisma from '../../lib/db'
 import { CreateProjectInput, UpdateProjectInput } from './project.types'
 import { NotFoundError } from '../../lib/errors'
+import { PaginationParams, buildPaginatedResponse } from '../../lib/pagination'
 
 export const createProject = async (input: CreateProjectInput, orgId: string) => {
   const project = await prisma.project.create({
@@ -14,7 +15,9 @@ export const createProject = async (input: CreateProjectInput, orgId: string) =>
   return project
 }
 
-export const getProjects = async (orgId: string) => {
+export const getProjects = async (orgId: string, pagination: PaginationParams) => {
+  const limit = pagination.limit || 20
+
   const projects = await prisma.project.findMany({
     where: { orgId },
     include: {
@@ -23,9 +26,14 @@ export const getProjects = async (orgId: string) => {
       },
     },
     orderBy: { createdAt: 'desc' },
+    take: limit + 1,
+    ...(pagination.cursor && {
+      cursor: { id: pagination.cursor },
+      skip: 1,
+    }),
   })
 
-  return projects
+  return buildPaginatedResponse(projects, limit)
 }
 
 export const getProjectById = async (projectId: string, orgId: string) => {

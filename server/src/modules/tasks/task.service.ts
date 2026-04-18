@@ -1,6 +1,7 @@
 import prisma from '../../lib/db'
 import { CreateTaskInput, UpdateTaskInput } from './task.types'
 import { NotFoundError } from '../../lib/errors'
+import { PaginationParams, buildPaginatedResponse } from '../../lib/pagination'
 
 export const createTask = async (
   input: CreateTaskInput,
@@ -29,7 +30,13 @@ export const createTask = async (
   return task
 }
 
-export const getTasksByProject = async (projectId: string, orgId: string) => {
+export const getTasksByProject = async (
+  projectId: string,
+  orgId: string,
+  pagination: PaginationParams
+) => {
+  const limit = pagination.limit || 20
+
   const tasks = await prisma.task.findMany({
     where: { projectId, orgId },
     include: {
@@ -42,9 +49,14 @@ export const getTasksByProject = async (projectId: string, orgId: string) => {
       },
     },
     orderBy: { createdAt: 'desc' },
+    take: limit + 1,
+    ...(pagination.cursor && {
+      cursor: { id: pagination.cursor },
+      skip: 1,
+    }),
   })
 
-  return tasks
+  return buildPaginatedResponse(tasks, limit)
 }
 
 export const getTaskById = async (taskId: string, orgId: string) => {

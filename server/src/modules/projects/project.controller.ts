@@ -7,6 +7,7 @@ import {
   deleteProject,
 } from './project.service'
 import { CreateProjectInput, UpdateProjectInput } from './project.types'
+import { getPaginationParams } from '../../lib/pagination'
 
 export const createProjectController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -27,12 +28,13 @@ export const createProjectController = async (req: Request, res: Response, next:
 export const getProjectsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orgId = req.orgId!
+    const pagination = getPaginationParams(req.query)
 
-    const projects = await getProjects(orgId)
+    const result = await getProjects(orgId, pagination)
 
     res.status(200).json({
       status: 'success',
-      data: projects,
+      ...result,
     })
   } catch (error) {
     next(error)

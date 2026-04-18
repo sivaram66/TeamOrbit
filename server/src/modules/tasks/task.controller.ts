@@ -7,6 +7,7 @@ import {
   deleteTask,
 } from './task.service'
 import { CreateTaskInput, UpdateTaskInput } from './task.types'
+import { getPaginationParams } from '../../lib/pagination'
 
 export const createTaskController = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -29,12 +30,13 @@ export const getTasksByProjectController = async (req: Request, res: Response, n
   try {
     const orgId = req.orgId!
     const projectId = req.params.projectId as string
+    const pagination = getPaginationParams(req.query)
 
-    const tasks = await getTasksByProject(projectId, orgId)
+    const tasks = await getTasksByProject(projectId, orgId, pagination)
 
     res.status(200).json({
       status: 'success',
-      data: tasks,
+      ...tasks,
     })
   } catch (error) {
     next(error)
