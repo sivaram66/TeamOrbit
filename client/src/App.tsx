@@ -8,6 +8,9 @@ import { OnboardingPage } from './pages/onboarding/OnboardingPage'
 import { AppShell } from './components/layouts/AppShell'
 import { ProjectsPage } from './pages/projects/ProjectsPage'
 import api from './lib/axios'
+import { ProjectDetailPage } from './pages/projects/ProjectDetailPage'
+import { MembersPage } from './pages/members/MembersPage'
+
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore()
@@ -73,10 +76,11 @@ function App() {
         <AppRoute><ProjectsPage /></AppRoute>
       } />
 
+      <Route path="/org/:slug/projects/:projectId" element={
+        <AppRoute><ProjectDetailPage /></AppRoute>
+      } />
       <Route path="/org/:slug/members" element={
-        <AppRoute>
-          <div style={{ color: '#888888', fontSize: '14px' }}>Members coming soon</div>
-        </AppRoute>
+        <AppRoute><MembersPage /></AppRoute>
       } />
 
       <Route path="/org/:slug/settings" element={
