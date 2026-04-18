@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/auth.store'
+import { LoginPage } from './pages/auth/LoginPage'
+import { RegisterPage } from './pages/auth/RegisterPage'
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore()
@@ -22,7 +24,7 @@ function App() {
         path="/login"
         element={
           <PublicRoute>
-            <div style={{ color: 'white' }}>Login page coming soon</div>
+            <LoginPage />
           </PublicRoute>
         }
       />
@@ -31,7 +33,7 @@ function App() {
         path="/register"
         element={
           <PublicRoute>
-            <div style={{ color: 'white' }}>Register page coming soon</div>
+            <RegisterPage />
           </PublicRoute>
         }
       />
@@ -40,7 +42,16 @@ function App() {
         path="/dashboard"
         element={
           <ProtectedRoute>
-            <div style={{ color: 'white' }}>Dashboard coming soon</div>
+            <div className="text-white p-8">Dashboard coming soon</div>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute>
+            <div className="text-white p-8">Onboarding coming soon</div>
           </ProtectedRoute>
         }
       />
