@@ -8,6 +8,8 @@ import inviteRouter from './modules/invites/invite.routes'
 import { authenticate } from './lib/middleware/auth.middleware'
 import { acceptInviteController } from './modules/invites/invite.controller'
 import { errorHandler } from './lib/middleware/error.middleware'
+import { validate } from './lib/middleware/validate.middleware'
+import { acceptInviteSchema } from './modules/invites/invite.schemas'
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -25,7 +27,7 @@ app.use('/api/orgs/:slug/projects', projectRouter)
 app.use('/api/orgs/:slug/projects/:projectId/tasks', taskRouter)
 app.use('/api/orgs/:slug/invites', inviteRouter)
 
-app.post('/api/invites/accept', authenticate, acceptInviteController)
+app.post('/api/invites/accept', authenticate, validate(acceptInviteSchema), acceptInviteController)
 
 app.get('/api/protected', authenticate, (req, res) => {
   res.json({ message: 'You are authenticated', user: req.user })
